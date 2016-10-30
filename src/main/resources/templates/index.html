@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<meta charset="UTF-8" />
+<title>TKR Viewer</title>
+</head>
+<body>
+	<div>
+
+		<h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}"></h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Name</th>
+					<th>Image</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="image: ${page.content}">
+					<td th:text="${image.id}" />
+					<td th:text="${image.name}" />
+					<td> <img th:src="@{'/images/' + ${image.name} + '/raw'}" /> </td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
