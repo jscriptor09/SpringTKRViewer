@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mjm.tkr.domain.Image;
 import com.mjm.tkr.services.ImageService;
@@ -71,35 +72,25 @@ public class HomeController {
 	
 	
 	@RequestMapping(method=RequestMethod.POST, value = BASE_PATH)
-	@ResponseBody
-	public ResponseEntity<?> createFile(@RequestParam ("file") MultipartFile file, HttpServletRequest servletRequest) throws URISyntaxException  {
-		
+	public String createFile(@RequestParam ("file") MultipartFile file, RedirectAttributes redirectAttributes){
 		try {
 			imageService.createImage(file);
-			final URI locationUri = new URI(servletRequest.getRequestURL().toString() + "/")
-					.resolve(file.getOriginalFilename() + "/raw");
-			return ResponseEntity.created(locationUri)
-					.body("Successfully upload " + file.getOriginalFilename());
+			redirectAttributes.addFlashAttribute("flash.message",  "Successfully uploaded " + file.getOriginalFilename());
 		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage());
+			redirectAttributes.addFlashAttribute("flash.message",  "Failed to uploaded " + file.getOriginalFilename() + " => " + e.getMessage());
 		}
-
+		return "redirect:/";
 	}
 	
-	@RequestMapping(method=RequestMethod.DELETE, value = BASE_PATH + "/" + FILENAME)
-	@ResponseBody
-	public ResponseEntity<?> deleteFile(@PathVariable String filename)  {
-		
+	@RequestMapping(method = RequestMethod.DELETE, value = BASE_PATH + "/" + FILENAME)
+	public String deleteFile(@PathVariable String filename,
+							 RedirectAttributes redirectAttributes) {
 		try {
 			imageService.deleteImage(filename);
-			return ResponseEntity.status(HttpStatus.NO_CONTENT)
-					.body("Successfully delete " + filename);
-		} catch (IOException e) {
-			
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Failed to delete " + filename + " => " + e.getMessage());
+			redirectAttributes.addFlashAttribute("flash.message", "Successfully deleted " + filename);
+		} catch (IOException|RuntimeException e) {
+			redirectAttributes.addFlashAttribute("flash.message", "Failed to delete " + filename + " => " + e.getMessage());
 		}
-		
+		return "redirect:/";
 	}
 }

@@ -52,7 +52,7 @@ public class ImageService {
 		}
 	}
 	
-	public void deleteImage(String filename) throws IOException{
+	public void deleteImage(String filename) throws IOException {
 		final Image byName = repository.findByName(filename);
 		repository.delete(byName);
 		Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
